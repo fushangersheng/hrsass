@@ -1,3 +1,44 @@
+import router from "./router";
+import store from "./store";
+import NProgress from "nprogress"; // 引入一份进度条插件
+import "nprogress/nprogress.css"; // 引入进度条样式
+const loginPath = "/login";
+const notPath = "/404";
+const whiteList = [loginPath, notPath];
+router.beforeEach(async (to, from, next) => {
+  NProgress.start();
+  if (store.getters.token) {
+    if (!store.getters.userId) {
+      const { roles } = await store.dispatch("user/getUserInfo");
+      console.log(roles);
+      const routes = await store.dispatch(
+        "permission/filterRoute",
+        roles.menus
+      );
+      router.addRoutes([...routes], {
+        path: "*",
+        redirect: "/404",
+        hidden: true,
+      });
+      next(to.path);
+    }
+    if (to.path === loginPath) {
+      next("/");
+    } else {
+      next();
+    }
+  } else {
+    if (whiteList.includes(to.path)) {
+      next();
+    } else {
+      next(loginPath);
+    }
+  }
+  NProgress.done();
+});
+router.afterEach(function () {
+  NProgress.done(); // 关闭进度条
+});
 // import router from './router'
 // import store from './store'
 // import { Message } from 'element-ui'

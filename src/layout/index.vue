@@ -53,7 +53,6 @@ export default {
 <style lang="scss" scoped>
   @import "~@/styles/mixin.scss";
   @import "~@/styles/variables.scss";
-
   .app-wrapper {
     @include clearfix;
     position: relative;
@@ -90,4 +89,7 @@ export default {
   .mobile .fixed-header {
     width: 100%;
   }
+  
+
+
 </style>

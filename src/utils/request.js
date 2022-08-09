@@ -1,10 +1,57 @@
 import axios from "axios";
+import { Message } from "element-ui";
+import { getTime } from "@/utils/auth";
+import store from "@/store";
+import router from "@/router";
+const TimeOut = 36000;
+const request = axios.create({
+  baseURL: process.env.VUE_APP_BASE_API,
+  timeout: 3000,
+});
 
-const request = axios.create({});
+function checkTimeout() {
+  const currTime = Date.now();
+  const timestamp = getTime();
+  return currTime - timestamp < TimeOut;
+}
+request.interceptors.request.use(
+  (config) => {
+    const token = store.getters.token;
+    if (token) {
+      // console.log(checkTimeout());
+      // if (checkTimeout) {
+      //   store.dispatch("user/logout");
+      //   router.push("/login");
+      //   return Promise.reject(new Error("超时了"));
+      // }
 
-request.interceptors.request.use();
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
-request.interceptors.response.use();
+request.interceptors.response.use(
+  (response) => {
+    const {
+      data: { data, success, message },
+    } = response;
+    if (success) {
+      return data;
+    }
+    Message.error(message || "系统错误");
+    return Promise.reject(message || "系统错误");
+  },
+  (error) => {
+    if (error.response.status === 401) {
+      store.dispatch("user/logout");
+      router.push("/login");
+    }
+    Message.error(error.response?.data?.message || "系统错误");
+    return Promise.reject(error);
+  }
+);
 
 export default request;
 // import { MessageBox, Message } from 'element-ui'

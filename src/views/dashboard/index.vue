@@ -1,20 +1,19 @@
 <template>
   <div class="dashboard-container">
-    <div class="dashboard-text">name: {{ name }}</div>
+    <div class="dashboard-text"></div>
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-
+import { mapGetters } from "vuex";
+import  mixin  from "@/utils/mixin";
 export default {
-  name: 'Dashboard',
+  name: "Dashboard",
+  mixins: [mixin],
   computed: {
-    ...mapGetters([
-      'name'
-    ])
-  }
-}
+    ...mapGetters(["name"]),
+  },
+};
 </script>
 
 <style lang="scss" scoped>
